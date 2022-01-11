@@ -1,7 +1,7 @@
-let http = require('http');
-let fs = require('fs');
-let url = require('url');
-let qs = require('querystring');
+let http = require('http')
+let fs = require('fs')
+let url = require('url')
+let qs = require('querystring')
 
 function templateHTML(title, list, body) {
   return `
@@ -33,9 +33,9 @@ function templatelist(filelist) {
 }
  
 let app = http.createServer(function(request,response){
-    let _url = request.url;
-    let queryData = url.parse(_url, true).query;
-    let pathname = url.parse(_url, true).pathname;
+    let _url = request.url
+    let queryData = url.parse(_url, true).query
+    let pathname = url.parse(_url, true).pathname
     
 
  
@@ -51,8 +51,8 @@ let app = http.createServer(function(request,response){
 
           let template = templateHTML(title, list, `<h2>${title}</h2>${description}`)
           
-          response.writeHead(200);
-          response.end(template);
+          response.writeHead(200)
+          response.end(template)
         })
 
       } else {
@@ -61,11 +61,11 @@ let app = http.createServer(function(request,response){
           
           let list = templatelist(filelist)
           fs.readFile(`data/${queryData.id}`, 'utf8', function(err, description){
-            let title = queryData.id;
+            let title = queryData.id
             let template = templateHTML(title, list, `<h2>${title}</h2>${description}`)
-            response.writeHead(200);
-            response.end(template);
-          });
+            response.writeHead(200)
+            response.end(template)
+          })
         })
       }
       
@@ -88,28 +88,31 @@ let app = http.createServer(function(request,response){
           </form>
         `)
         
-        response.writeHead(200);
-        response.end(template);
+        response.writeHead(200)
+        response.end(template)
       })
     } else if(pathname === '/create_process'){
-      let body = '';
+      let body = ''
       request.on('data', function(data){
-          body = body + data;
-      }); 
+          body = body + data
+      }) 
       
       request.on('end', function(){
-        let post = qs.parse(body);
-        let title = post.title;
+        let post = qs.parse(body)
+        let title = post.title
         let description = post.description
-    });
-      response.writeHead(200);
-      response.end('success');
+        fs.writeFile(`data/${title}`, description, 'utf8', function(err) {
+          
+          response.writeHead(302, {location:`/?id=${title}`})
+          response.end('success')
+        })
+    })
     } else {
-      response.writeHead(404);
-      response.end('Not found');
+      response.writeHead(404)
+      response.end('Not found')
     }
  
  
  
-});
-app.listen(3000);
+})
+app.listen(3000)
