@@ -3,8 +3,8 @@ let fs = require('fs')
 let url = require('url')
 let qs = require('querystring')
 let path = require('path')
-
 let template = require('./lib/template.js')
+let sanitizeHtml = require('sanitize-html')
 
 
  
@@ -43,17 +43,19 @@ let app = http.createServer(function(request,response){
           fs.readFile(`data/${filterdId}`, 'utf8', function(err, description){
             let list = template.list(filelist)
             let title = queryData.id
-            let html = template.html(title, list,
-               `<h2>${title}</h2>${description}`, 
+            let sanitizedTitle = sanitizeHtml(title)
+            let sanitizedDescription =sanitizeHtml(description)
+            let html = template.html(sanitizedTitle, list,
+               `<h2>${sanitizedTitle}</h2>${sanitizedDescription}`, 
                `<a href="/create">create</a>
-                <a href="/update?id=${title}">update</a>
+                <a href="/update?id=${sanitizedTitle}">update</a>
                 <form action="delete_process" method="post">
-                  <input type="hidden" name="id" value="${title}">
+                  <input type="hidden" name="id" value="${sanitizedDescription}">
                   <input type="submit" value="delete">
                 </form>
                 `)
             response.writeHead(200)
-            response.end(template)
+            response.end(html)
           })
         })
       }
@@ -78,7 +80,7 @@ let app = http.createServer(function(request,response){
         `,'')
         
         response.writeHead(200)
-        response.end(template)
+        response.end(html)
       })
     } else if(pathname === '/create_process'){
       let body = ''
@@ -120,7 +122,7 @@ let app = http.createServer(function(request,response){
                `
           )
           response.writeHead(200)
-          response.end(template)
+          response.end(html)
         })
       })
     } else if(pathname === '/update_process'){

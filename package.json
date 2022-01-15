@@ -1,0 +1,25 @@
+{
+  "name": "web1_html_internet-master",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Takarada0202/node.js.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Takarada0202/node.js/issues"
+  },
+  "homepage": "https://github.com/Takarada0202/node.js#readme",
+  "dependencies": {
+    "sanitize-html": "^2.6.1"
+  }
+}
