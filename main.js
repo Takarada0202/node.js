@@ -3,34 +3,37 @@ let fs = require('fs')
 let url = require('url')
 let qs = require('querystring')
 
-function templateHTML(title, list, body, control) {
-  return `
-  <!doctype html>
-          <html>
-          <head>
-            <title>WEB1 - ${title}</title>
-            <meta charset="utf-8">
-          </head>
-          <body>
-            <h1><a href="/">WEB</a></h1>
-            ${list}
-            ${control}
-            ${body}
-          </body>
-          </html>
-  `
+let template = {
+  html:function (title, list, body, control) {
+    return `
+    <!doctype html>
+            <html>
+            <head>
+              <title>WEB1 - ${title}</title>
+              <meta charset="utf-8">
+            </head>
+            <body>
+              <h1><a href="/">WEB</a></h1>
+              ${list}
+              ${control}
+              ${body}
+            </body>
+            </html>
+    `
+  },list:function (filelist) {
+    let list = `<ul>`
+      let i = 0
+      while(i < filelist.length){
+      list = list + `<li><a href="/?id=${filelist[i]}">${filelist[i]}</a></li>`
+      i = i + 1
+    }
+    list = list+`</ul>`
+    return list
+  }
+
 }
 
-function templatelist(filelist) {
-  let list = `<ul>`
-    let i = 0
-    while(i < filelist.length){
-    list = list + `<li><a href="/?id=${filelist[i]}">${filelist[i]}</a></li>`
-    i = i + 1
-  }
-  list = list+`</ul>`
-  return list
-}
+
  
 let app = http.createServer(function(request,response){
     let _url = request.url
@@ -48,24 +51,26 @@ let app = http.createServer(function(request,response){
           let title = 'Welcome'
           let description = 'Hello, Node.js'
           
-          let list = templatelist(filelist)
+          let list = template.list(filelist)
 
-          let template = templateHTML(title, list,
+          let html = template.html(title, list,
             `<h2>${title}</h2>${description}`,
            `<a href="/create">create</a>`)
           
           response.writeHead(200)
-          response.end(template)
+          response.end(html)
+
+
         })
 
       } else {
         fs.readdir('./data', function(error, filelist) {
 
           
-          let list = templatelist(filelist)
           fs.readFile(`data/${queryData.id}`, 'utf8', function(err, description){
+            let list = template.list(filelist)
             let title = queryData.id
-            let template = templateHTML(title, list,
+            let html = template.html(title, list,
                `<h2>${title}</h2>${description}`, 
                `<a href="/create">create</a>
                 <a href="/update?id=${title}">update</a>
@@ -85,9 +90,9 @@ let app = http.createServer(function(request,response){
 
         let title = 'WEB - create'
         
-        let list = templatelist(filelist)
+        let list = template.list(filelist)
 
-        let template = templateHTML(title, list, `
+        let html = template.html(title, list, `
           <form action="/create_process" method="post">
             <p><input type="text" name="title" placeholder="title"></p>
             <p>
@@ -122,8 +127,8 @@ let app = http.createServer(function(request,response){
       fs.readdir('./data', function(error, filelist){
         fs.readFile(`data/${queryData.id}`, 'utf8', function(err, description){
           let title = queryData.id
-          let list = templatelist(filelist)
-          let template = templateHTML(title, list,
+          let list = template.list(filelist)
+          let html = template.html(title, list,
             `
             <form action="/update_process" method="post">
               <input type="hidden" name="id" value="${title}">
